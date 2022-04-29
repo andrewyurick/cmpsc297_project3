@@ -2,12 +2,12 @@
 pragma solidity >=0.7.0 <0.9.0;
 // Sol Test
 
-//Flower shop interactive example. 
+//My project. A Butcher Shop.  
 contract FlowerShop {
 
     // State variables
     address public owner;
-    bool shopIsOpen;
+    bool marketIsOpen;
     mapping (address => uint) tulipStock;
     mapping (address => uint) roseStock;
     mapping (address => uint) peonyStock;
@@ -27,7 +27,7 @@ contract FlowerShop {
         bouquets[address(this)]    = 0;
 
         // The shop is initially closed
-        shopIsOpen = true;
+        marketIsOpen = true;
     }
 
     // Function to compare two strings
@@ -59,19 +59,19 @@ contract FlowerShop {
 
     // Let the owner open and close the shop
     function openOrCloseShop() public returns (string memory) {
-        if (shopIsOpen) {
-            shopIsOpen = false;
-            return "Shop is now closed.";
+        if (marketIsOpen) {
+            marketIsOpen = false;
+            return "Butcher market is currently closed. Please return later.";
         } else {
-            shopIsOpen = true;
-            return "Shop is now open.";
+            marketIsOpen = true;
+            return "Butcher market is open.";
         }
     }
 
     // Purchase a flower from the shop
     function purchase(uint amount, string memory flowerType) public payable {
-        require(shopIsOpen == true, "The shop is closed and you may not buy flowers.");
-        require(msg.value >= amount * 1 ether, "You must pay at least 1 ETH per flower arrangement!");
+        require(marketIsOpen == true, "The market is closed and you may not purchase meat.");
+        require(msg.value >= amount * 1 ether, "You must pay at least 1 ETH per cut of meat!");
 
         // Sell a flower arrangement based on type asked
         if (compareStrings(flowerType, "tulip")) {
