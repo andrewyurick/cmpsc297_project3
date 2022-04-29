@@ -3,16 +3,25 @@ pragma solidity >=0.7.0 <0.9.0;
 // Sol Test
 
 //My project. A Butcher Shop.  
-contract FlowerShop {
+contract ButcherMarket {
 
     // State variables
-    address public owner;
-    bool marketIsOpen;
-    mapping (address => uint) tulipStock;
-    mapping (address => uint) roseStock;
-    mapping (address => uint) peonyStock;
-    mapping (address => uint) orchidStock;
-    mapping (address => uint) bouquets;
+    address public owner;//Owner
+    bool marketIsOpen;//Business is open or closed depending on this. 
+    
+    //Slices of meat offered.
+
+    //Beef
+    mapping (address => uint) ribeyeStock;
+    mapping (address => uint) filetStock;
+    mapping (address => uint) flankStock;
+    mapping (address => uint) newYorkStripStock;
+    mapping (address => uint) cow;
+
+    //Picnic cuts
+    mapping (address => uint) pepperoniStock;
+    mapping (address => uint) salamiStock;
+
 
     // On creation...
     constructor () {
@@ -20,11 +29,17 @@ contract FlowerShop {
         owner = msg.sender;
 
         // Set initial flower stocks
-        tulipStock[address(this)]  = 1000;
-        roseStock[address(this)]   = 1000;
-        peonyStock[address(this)]  = 1000;
-        orchidStock[address(this)] = 1000;
-        bouquets[address(this)]    = 0;
+        ribeyeStock[address(this)]  = 500;
+        filetStock[address(this)]   = 100;
+        flankStock[address(this)]  = 1500;
+        newYorkStripStock[address(this)] = 1000;
+        
+        // Whole cow
+        cow[address(this)] = 0;
+
+        // Picnic cuts 
+        pepperoniStock[address(this)] = 2000;
+        salamiStock[address(this)] = 2500;
 
         // The shop is initially closed
         marketIsOpen = true;
@@ -36,24 +51,33 @@ contract FlowerShop {
     }
 
     // Let the owner restock the shop
-    function restock(uint amount, string memory flowerType) public {
+    function restock(uint amount, string memory meatCut) public {
         // Only the owner can restock!
         require(msg.sender == owner, "Only the owner can restock the machine!");
 
         // Refill the stock based on the type passed in
-        if (compareStrings(flowerType, "tulip")) {
-            tulipStock[address(this)] += amount;
-        } else if (compareStrings(flowerType, "rose")) {
-            roseStock[address(this)] += amount;
-        } else if (compareStrings(flowerType, "peony")) {
-            peonyStock[address(this)] += amount;
-        } else if (compareStrings(flowerType, "orchid")) {
-            orchidStock[address(this)] += amount;
-        } else if (compareStrings(flowerType, "all")) {
-            tulipStock[address(this)] += amount;
-            roseStock[address(this)] += amount;
-            peonyStock[address(this)] += amount;
-            orchidStock[address(this)] += amount;
+        if (compareStrings(meatCut, "ribeye")) {
+            ribeyeStock[address(this)] += amount;
+        } else if (compareStrings(meatCut, "filet")) {
+            filetStock[address(this)] += amount;
+        } else if (compareStrings(meatCut, "flank")) {
+            flankStock[address(this)] += amount;
+        } else if (compareStrings(meatCut, "strip")) {
+            newYorkStripStock[address(this)] += amount;
+        } else if (compareStrings(meatCut, "pepperoni")){
+            pepperoniStock[address(this)] += amount;
+        }
+        else if (compareStrings(meatCut, "salami")){
+            salamiStock[address(this)] += amount;
+        }
+        
+        else if (compareStrings(meatCut, "all")) {
+            ribeyeStock[address(this)] += amount;
+            filetStock[address(this)] += amount;
+            flankStock[address(this)] += amount;
+            newYorkStripStock[address(this)] += amount;
+            pepperoniStock[address(this)] += amount;
+            salamiStock[address(this)] += amount;
         }
     }
 
@@ -68,46 +92,60 @@ contract FlowerShop {
         }
     }
 
-    // Purchase a flower from the shop
-    function purchase(uint amount, string memory flowerType) public payable {
+    // Purchase a meat from the butcher
+    function purchase(uint amount, string memory meatCut) public payable {
         require(marketIsOpen == true, "The market is closed and you may not purchase meat.");
         require(msg.value >= amount * 1 ether, "You must pay at least 1 ETH per cut of meat!");
 
-        // Sell a flower arrangement based on type asked
-        if (compareStrings(flowerType, "tulip")) {
-            tulipStock[address(this)] -= amount;
-            tulipStock[msg.sender] += amount;
-        } else if (compareStrings(flowerType, "rose")) {
-            roseStock[address(this)] -= amount;
-            roseStock[msg.sender] += amount;
-        } else if (compareStrings(flowerType, "peony")) {
-            peonyStock[address(this)] -= amount;
-            peonyStock[msg.sender] += amount;
-        } else if (compareStrings(flowerType, "orchid")) {
-            orchidStock[address(this)] -= amount;
-            orchidStock[msg.sender] += amount;
-        } else if (compareStrings(flowerType, "bouquet")) {
-            tulipStock[address(this)] -= amount;
-            roseStock[address(this)] -= amount;
-            peonyStock[address(this)] -= amount;
-            orchidStock[address(this)] -= amount;
+        // Sell a meat slice based on type asked
+        if (compareStrings(meatCut, "ribeye")) {
+            ribeyeStock[address(this)] -= amount;
+            ribeyeStock[msg.sender] += amount;
+        } else if (compareStrings(meatCut, "filet")) {
+            filetStock[address(this)] -= amount;
+            filetStock[msg.sender] += amount;
+        } else if (compareStrings(meatCut, "flank")) {
+            flankStock[address(this)] -= amount;
+            flankStock[msg.sender] += amount;
+        } else if (compareStrings(meatCut, "strip")) {
+            newYorkStripStock[address(this)] -= amount;
+            newYorkStripStock[msg.sender] += amount;
+        } else if (compareStrings(meatCut, "pepperoni")){
+            pepperoniStock[address(this)] -= amount;
+            pepperoniStock[msg.sender] += amount;
+        } 
+        else if (compareStrings(meatCut, "salami")){
+            salamiStock[address(this)] += amount;
+            salamiStock[msg.sender] += amount;
+        }
+        
+        else if (compareStrings(meatCut, "cow")) {
+            ribeyeStock[address(this)] -= amount;
+            filetStock[address(this)] -= amount;
+            flankStock[address(this)] -= amount;
+            newYorkStripStock[address(this)] -= amount;
 
-            bouquets[msg.sender] += amount;
+            cow[msg.sender] += amount;
         }
     }
 
-    // Get stock of a specific type of flower
-    function getStock(string memory flowerType) public view returns (uint) {
-        // Get stock of a flower based on the type passed in
-        if (compareStrings(flowerType, "tulip")) {
-            return tulipStock[address(this)];
-        } else if (compareStrings(flowerType, "rose")) {
-            return roseStock[address(this)];
-        } else if (compareStrings(flowerType, "peony")) {
-            return peonyStock[address(this)];
-        } else if (compareStrings(flowerType, "orchid")) {
-            return orchidStock[address(this)];
-        } else {
+    // Get stock of a specific type of meat
+    function getStock(string memory meatCut) public view returns (uint) {
+        // Get stock of a meat based on the type passed in
+        if (compareStrings(meatCut, "ribeye")) {
+            return ribeyeStock[address(this)];
+        } else if (compareStrings(meatCut, "filet")) {
+            return filetStock[address(this)];
+        } else if (compareStrings(meatCut, "flank")) {
+            return flankStock[address(this)];
+        } else if (compareStrings(meatCut, "strip")) {
+            return newYorkStripStock[address(this)];
+        } else if (compareStrings(meatCut, "pepperoni")) {
+            return pepperoniStock[address(this)];
+        } else if (compareStrings(meatCut, "salamiStock")){
+            return salamiStock[address(this)];
+        }
+        else {
             return 0;
         }
     }
